@@ -10,6 +10,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static ru.yandex.practicum.filmorate.controller.TestDate.*;
 
 class UserControllerTest {
     private ValidateService validateService = new ValidateService();
@@ -19,7 +20,7 @@ class UserControllerTest {
     @Test
     void createUserIsNull() {
         ValidationException exception = assertThrows(ValidationException.class, () -> userController.createUser(null));
-        assertEquals("User не должен быть пустым", exception.getMessage());
+        assertEquals(USER_NULL, exception.getMessage());
     }
     @Test
     void createUserEmailIsNotCorrect(){
@@ -28,9 +29,9 @@ class UserControllerTest {
         User user1 = new User();
         user1.setEmail("email.ru");
         ValidationException exception = assertThrows(ValidationException.class, () -> userController.createUser(user));
-        assertEquals("Электронная почта не должна быть пустой", exception.getMessage());
+        assertEquals(EMAIL_ERROR, exception.getMessage());
         ValidationException exception1 = assertThrows(ValidationException.class, () -> userController.createUser(user1));
-        assertEquals("Электронная почта не должна быть пустой", exception1.getMessage());
+        assertEquals(EMAIL_ERROR, exception1.getMessage());
     }
     @Test
     void createUserLoginIsEmpty(){
@@ -41,9 +42,9 @@ class UserControllerTest {
         user1.setEmail("email@m.ru");
         user1.setLogin("email ru");
         ValidationException exception = assertThrows(ValidationException.class, () -> userController.createUser(user));
-        assertEquals("Логин не должен быть пустым", exception.getMessage());
+        assertEquals(LOGIN_ERROR, exception.getMessage());
         ValidationException exception1 = assertThrows(ValidationException.class, () -> userController.createUser(user1));
-        assertEquals("Логин не должен быть пустым", exception1.getMessage());
+        assertEquals(LOGIN_ERROR, exception1.getMessage());
     }
     @Test
     void createUserNameIsEmpty(){
@@ -63,6 +64,56 @@ class UserControllerTest {
         user.setLogin("login");
         user.setBirthday(LocalDate.now().plusMonths(1));
         ValidationException exception = assertThrows(ValidationException.class, () -> userController.createUser(user));
-        assertEquals("Дата рождения не может быть в будущем", exception.getMessage());
+        assertEquals(BIRTHDAY_ERROR, exception.getMessage());
+    }
+
+    @Test
+    void updateUserIsNull() {
+        ValidationException exception = assertThrows(ValidationException.class, () -> userController.createUser(null));
+        assertEquals(USER_NULL, exception.getMessage());
+    }
+    @Test
+    void updateUserEmailIsNotCorrect(){
+        User user = new User();
+        user.setEmail(" ");
+        User user1 = new User();
+        user1.setEmail("email.ru");
+        ValidationException exception = assertThrows(ValidationException.class, () -> userController.createUser(user));
+        assertEquals(EMAIL_ERROR, exception.getMessage());
+        ValidationException exception1 = assertThrows(ValidationException.class, () -> userController.createUser(user1));
+        assertEquals(EMAIL_ERROR, exception1.getMessage());
+    }
+    @Test
+    void updateUserLoginIsEmpty(){
+        User user = new User();
+        user.setEmail("email@m.ru");
+        user.setLogin("");
+        User user1 = new User();
+        user1.setEmail("email@m.ru");
+        user1.setLogin("email ru");
+        ValidationException exception = assertThrows(ValidationException.class, () -> userController.createUser(user));
+        assertEquals(LOGIN_ERROR, exception.getMessage());
+        ValidationException exception1 = assertThrows(ValidationException.class, () -> userController.createUser(user1));
+        assertEquals(LOGIN_ERROR, exception1.getMessage());
+    }
+    @Test
+    void updateUserNameIsEmpty(){
+        User user = new User();
+        user.setEmail("email@m.ru");
+        user.setLogin("login");
+        user.setName("");
+        user.setBirthday(LocalDate.parse("1995-12-10",
+                DateTimeFormatter.ofPattern("yyyy-MM-dd")));
+        User user1 = userController.createUser(user);
+        assertEquals(user.getLogin(), user1.getName());
+    }
+    @Test
+    void updateUserBirthdayInFuture(){
+        User user = new User();
+        user.setEmail("email@m.ru");
+        user.setLogin("login");
+        user.setBirthday(LocalDate.now().plusMonths(1));
+        ValidationException exception = assertThrows(ValidationException.class, () -> userController.createUser(user));
+        assertEquals(BIRTHDAY_ERROR, exception.getMessage());
     }
 }

@@ -23,14 +23,15 @@ public class FilmController {
     public Film addFilm(@RequestBody Film newFilm) {
         validateService.validateFilm(newFilm);
         Film filmSave = repository.save(newFilm);
-        log.info("Фильм добавлен");
+        log.info("Добавлен фильм = {}", newFilm.getName());
         return filmSave;
     }
 
     @PutMapping
     public Film updateFilm(@RequestBody Film film) {
+        validateService.validateFilm(film);
         Film filmUpdate = repository.update(film);
-        log.info("Фильм обновлен");
+        log.info("Фильм с ID = "+film.getId()+" обновлен");
 
         return filmUpdate;
     }

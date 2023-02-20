@@ -1,7 +1,6 @@
 package ru.yandex.practicum.filmorate.controller;
 
 import ru.yandex.practicum.filmorate.exception.ValidationException;
-import ru.yandex.practicum.filmorate.controller.FilmController;
 import ru.yandex.practicum.filmorate.model.Film;
 import org.junit.jupiter.api.Test;
 import ru.yandex.practicum.filmorate.repository.FilmRepository;
@@ -11,6 +10,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static ru.yandex.practicum.filmorate.controller.TestDate.*;
 
 class FilmControllerTest {
 
@@ -24,7 +24,7 @@ class FilmControllerTest {
     @Test
     void addFilmIsNull() {
         ValidationException exception = assertThrows(ValidationException.class, () -> filmController.addFilm(null));
-        assertEquals("Фильм не должен быть пустым", exception.getMessage());
+        assertEquals(FILM_ERROR, exception.getMessage());
     }
 
     @Test
@@ -33,9 +33,9 @@ class FilmControllerTest {
         film.setName(" ");
         Film film1 = new Film();
         ValidationException exception = assertThrows(ValidationException.class, () -> filmController.addFilm(film));
-        assertEquals("Название фильма не должно быть пустым", exception.getMessage());
+        assertEquals(FILM_NAME_ERROR, exception.getMessage());
         ValidationException exception1 = assertThrows(ValidationException.class, () -> filmController.addFilm(film1));
-        assertEquals("Название фильма не должно быть пустым", exception1.getMessage());
+        assertEquals(FILM_NAME_ERROR, exception1.getMessage());
     }
 
     @Test
@@ -45,7 +45,7 @@ class FilmControllerTest {
         film.setDescription("Создайте заготовку проекта с помощью Spring Initializr. Некоторые параметры вы найдёте в этой таблице," +
                 " остальные заполните самостоятельно. Ура! Проект сгенерирован. Теперь можно шаг за шагом реализовать приложение.");
         ValidationException exception = assertThrows(ValidationException.class, () -> filmController.addFilm(film));
-        assertEquals("Максимальная длина описания - 200 символов", exception.getMessage());
+        assertEquals(DESCRIPTION_ERROR, exception.getMessage());
 
     }
     @Test
@@ -57,7 +57,7 @@ class FilmControllerTest {
         film.setReleaseDate(LocalDate.parse("1895-12-10",
                 DateTimeFormatter.ofPattern("yyyy-MM-dd")));
         ValidationException exception = assertThrows(ValidationException.class, () -> filmController.addFilm(film));
-        assertEquals("Дата релиза не раньше 28.12.1895", exception.getMessage());
+        assertEquals(RELEASE_DATE, exception.getMessage());
 
     }
     @Test
@@ -69,6 +69,57 @@ class FilmControllerTest {
                 DateTimeFormatter.ofPattern("yyyy-MM-dd")));
         film.setDuration(-1);
         ValidationException exception = assertThrows(ValidationException.class, () -> filmController.addFilm(film));
-        assertEquals("Продолжительность фильма должна быть положительной", exception.getMessage());
+        assertEquals(DURATION_ERROR, exception.getMessage());
+    }
+
+    @Test
+    void updateFilmIsNull() {
+        ValidationException exception = assertThrows(ValidationException.class, () -> filmController.addFilm(null));
+        assertEquals(FILM_ERROR, exception.getMessage());
+    }
+
+    @Test
+    void updateFilmIsNameEmptyOrNull() {
+        Film film = new Film();
+        film.setName(" ");
+        Film film1 = new Film();
+        ValidationException exception = assertThrows(ValidationException.class, () -> filmController.addFilm(film));
+        assertEquals(FILM_NAME_ERROR, exception.getMessage());
+        ValidationException exception1 = assertThrows(ValidationException.class, () -> filmController.addFilm(film1));
+        assertEquals(FILM_NAME_ERROR, exception1.getMessage());
+    }
+
+    @Test
+    void updateFilmLengthDescription() {
+        Film film = new Film();
+        film.setName("name");
+        film.setDescription("Создайте заготовку проекта с помощью Spring Initializr. Некоторые параметры вы найдёте в этой таблице," +
+                " остальные заполните самостоятельно. Ура! Проект сгенерирован. Теперь можно шаг за шагом реализовать приложение.");
+        ValidationException exception = assertThrows(ValidationException.class, () -> filmController.addFilm(film));
+        assertEquals(DESCRIPTION_ERROR, exception.getMessage());
+
+    }
+    @Test
+    void updateFilmReleaseDateIsAfter(){
+        Film film = new Film();
+        film.setName("name");
+        film.setDescription("Создайте заготовку проекта с помощью Spring Initializr. Некоторые параметры вы найдёте в этой таблице, " +
+                "остальные заполните самостоятельно.Ура! Проект сгенерирован. Теперь можно шаг за шагом реализован");
+        film.setReleaseDate(LocalDate.parse("1895-12-10",
+                DateTimeFormatter.ofPattern("yyyy-MM-dd")));
+        ValidationException exception = assertThrows(ValidationException.class, () -> filmController.addFilm(film));
+        assertEquals(RELEASE_DATE, exception.getMessage());
+
+    }
+    @Test
+    void updateFilmDurationNegative(){
+        Film film = new Film();
+        film.setName("name");
+        film.setDescription("Description");
+        film.setReleaseDate(LocalDate.parse("1899-12-10",
+                DateTimeFormatter.ofPattern("yyyy-MM-dd")));
+        film.setDuration(-1);
+        ValidationException exception = assertThrows(ValidationException.class, () -> filmController.addFilm(film));
+        assertEquals(DURATION_ERROR, exception.getMessage());
     }
 }
