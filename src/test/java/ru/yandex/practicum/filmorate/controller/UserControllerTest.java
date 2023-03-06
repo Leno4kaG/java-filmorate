@@ -130,7 +130,7 @@ class UserControllerTest {
         assertEquals(user1.getId(), userWithFriend.getFriends().get(0));
 
         UserNotFoundException exception = assertThrows(UserNotFoundException.class, () -> userController.addFriend(user.getId(),-1));
-        assertEquals("Пользователь № 1 не найден", exception.getMessage());
+        assertEquals(String.format("Пользователь № %d не найден", user.getId()), exception.getMessage());
     }
     @Test
     void deleteFriend(){
