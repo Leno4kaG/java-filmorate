@@ -1,21 +1,26 @@
 package ru.yandex.practicum.filmorate.controller;
 
 import org.junit.jupiter.api.Test;
+import ru.yandex.practicum.filmorate.exception.UserNotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.repository.UserRepository;
+import ru.yandex.practicum.filmorate.service.UserService;
 import ru.yandex.practicum.filmorate.service.ValidateService;
+import ru.yandex.practicum.filmorate.storage.user.InMemoryUserStorage;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static ru.yandex.practicum.filmorate.controller.TestDate.*;
 
 class UserControllerTest {
     private ValidateService validateService = new ValidateService();
-    private UserRepository userRepository = new UserRepository();
-    private UserController userController = new UserController(validateService, userRepository);
+    private InMemoryUserStorage userStorage = new InMemoryUserStorage();
+    private UserService userService = new UserService(userStorage);
+    private UserController userController = new UserController(validateService, userStorage, userService);
 
     @Test
     void createUserIsNull() {
@@ -115,5 +120,55 @@ class UserControllerTest {
         user.setBirthday(LocalDate.now().plusMonths(1));
         ValidationException exception = assertThrows(ValidationException.class, () -> userController.createUser(user));
         assertEquals(BIRTHDAY_ERROR, exception.getMessage());
+    }
+    @Test
+    void addFriend(){
+        User user = userController.createUser(TestDate.addUser());
+        User user1 = userController.createUser(TestDate.addUser());
+
+        User userWithFriend = userController.addFriend(user.getId(), user1.getId());
+        assertEquals(user1.getId(), userWithFriend.getFriends().get(0));
+
+        UserNotFoundException exception = assertThrows(UserNotFoundException.class, () -> userController.addFriend(user.getId(),-1));
+        assertEquals("Пользователь № 1 не найден", exception.getMessage());
+    }
+    @Test
+    void deleteFriend(){
+        User user = userController.createUser(TestDate.addUser());
+        User user1 = userController.createUser(TestDate.addUser());
+        userController.addFriend(user.getId(), user1.getId());
+
+        User userWithOutFriend = userController.deleteFriend(user.getId(), user1.getId());
+       assertTrue(userWithOutFriend.getFriends().isEmpty());
+
+        UserNotFoundException exception = assertThrows(UserNotFoundException.class, () -> userController.deleteFriend(user.getId(),-1));
+        assertEquals("Пользователь № 1 не найден", exception.getMessage());
+    }
+    @Test
+    void getFriends(){
+        User user = userController.createUser(TestDate.addUser());
+        User user1 = userController.createUser(TestDate.addUser());
+        userController.addFriend(user.getId(), user1.getId());
+
+        List<User> friends = userController.getFriends(user.getId());
+        assertEquals(user1, friends.get(0));
+
+        UserNotFoundException exception = assertThrows(UserNotFoundException.class, () -> userController.getFriends(999));
+        assertEquals("Пользователь № 999 не найден", exception.getMessage());
+    }
+    @Test
+    void getCommonFriends(){
+        User user = userController.createUser(TestDate.addUser());
+        User user1 = userController.createUser(TestDate.addUser());
+        User user2 = userController.createUser(TestDate.addUser());
+        userController.addFriend(user.getId(), user1.getId());
+        userController.addFriend(user.getId(), user2.getId());
+        userController.addFriend(user1.getId(), user2.getId());
+
+        List<User> commonFriends = userController.getCommonFriends(user.getId(), user1.getId());
+        assertEquals(user2, commonFriends.get(0));
+
+        UserNotFoundException exception = assertThrows(UserNotFoundException.class, () -> userController.getCommonFriends(999, 0));
+        assertEquals("Пользователь № 999 не найден", exception.getMessage());
     }
 }

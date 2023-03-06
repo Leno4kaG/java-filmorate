@@ -3,7 +3,7 @@ package ru.yandex.practicum.filmorate.model;
 import lombok.Data;
 
 import java.time.LocalDate;
-import java.util.Objects;
+import java.util.*;
 
 @Data
 public class User {
@@ -12,6 +12,18 @@ public class User {
     private String login;
     private String name;
     private LocalDate birthday;
+    private final Set<Integer> friends = new HashSet<>();
+
+    public void addFriend(int id){
+        friends.add(id);
+    }
+    public int deleteFriend(int id){
+       friends.remove(id);
+       return id;
+    }
+    public List<Integer> getFriends(){
+        return new ArrayList<>(friends);
+    }
 
     @Override
     public boolean equals(Object o) {
