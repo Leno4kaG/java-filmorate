@@ -23,7 +23,7 @@ class FilmControllerTest {
     private InMemoryFilmStorage filmStorage = new InMemoryFilmStorage();
     private FilmService filmService = new FilmService(filmStorage);
 
-    private FilmController filmController = new FilmController(validateService, filmStorage, filmService);
+    private FilmController filmController = new FilmController(filmService);
 
 
     @Test
@@ -154,7 +154,7 @@ class FilmControllerTest {
         assertEquals(filmWithLike, films.get(0));
 
         ValidationException exception = assertThrows(ValidationException.class, ()-> filmController.getListFilms(-1));
-        assertEquals("Count < 0", exception.getMessage());
+        assertEquals("Count <= 0", exception.getMessage());
 
     }
 }

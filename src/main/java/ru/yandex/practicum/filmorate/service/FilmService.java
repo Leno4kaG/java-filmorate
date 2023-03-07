@@ -1,7 +1,10 @@
 package ru.yandex.practicum.filmorate.service;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import ru.yandex.practicum.filmorate.exception.FilmNotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
@@ -13,6 +16,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 public class FilmService {
     private final FilmStorage filmStorage;
@@ -20,6 +24,27 @@ public class FilmService {
     @Autowired
     public FilmService(FilmStorage filmStorage) {
         this.filmStorage = filmStorage;
+    }
+
+    public Film addFilm(Film newFilm) {
+        ValidateService.validateFilm(newFilm);
+        Film filmSave = filmStorage.save(newFilm);
+        log.info("Добавлен фильм = {}", newFilm.getName());
+        return filmSave;
+    }
+    public Film updateFilm(Film film) {
+       ValidateService.validateFilm(film);
+        Film filmUpdate = filmStorage.update(film);
+        log.info("Фильм обновлен Id = {}", film.getId());
+
+        return filmUpdate;
+    }
+    public List<Film> getFilms() {
+        return filmStorage.getFilms();
+    }
+    public Film getFilmById(Integer id) {
+        return Optional.ofNullable(filmStorage.getFilm(id)).orElseThrow(() ->
+                new FilmNotFoundException(String.format("Фильм № %d не найден", id)));
     }
 
     public Film addLike(int id, int userId) {
@@ -48,7 +73,12 @@ public class FilmService {
         if(allFilms.isEmpty()){
             return allFilms;
         }
-        allFilms.sort(Collections.reverseOrder());
-        return allFilms.stream().limit(count).collect(Collectors.toList());
+        return allFilms.stream().sorted(this::compare).limit(count).collect(Collectors.toList());
+    }
+
+    private int compare(Film f0, Film f1) {
+        int size0 = f0.getSizeLikes();
+        int size1 = f1.getSizeLikes();
+        return Integer.compare(size1, size0);
     }
 }

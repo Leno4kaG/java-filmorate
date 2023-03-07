@@ -19,35 +19,28 @@ import java.util.Optional;
 @RequestMapping("/users")
 public class UserController {
 
-    private final ValidateService validateService;
-    private final UserStorage userStorage;
+
+
     private final UserService userService;
 
     @PostMapping
     public User createUser(@RequestBody User newUser) {
-        validateService.validateUser(newUser);
-        User userSave = userStorage.save(newUser);
-        log.info("Пользователь " + newUser.getName() + " добавлен");
-        return userSave;
+        return userService.createUser(newUser);
     }
 
     @PutMapping
     public User updateUser(@RequestBody User user) {
-        validateService.validateUser(user);
-        User userUpdate = userStorage.update(user);
-        log.info("Пользователь с ID = " + user.getId() + " обновлен");
-        return userUpdate;
+               return userService.updateUser(user);
     }
 
     @GetMapping
     public List<User> getUsers() {
-        return userStorage.getUsers();
+        return userService.getUsers();
     }
 
     @GetMapping("/{id}")
     public User getUserById(@PathVariable Integer id) {
-        return Optional.ofNullable(userStorage.getUserById(id)).orElseThrow(() ->
-                new UserNotFoundException(String.format("Пользователь № %d не найден", id)));
+        return userService.getUserById(id);
     }
 
     @PutMapping("/{id}/friends/{friendId}")

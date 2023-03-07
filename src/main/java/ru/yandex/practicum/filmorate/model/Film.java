@@ -11,7 +11,7 @@ import java.util.Objects;
 import java.util.Set;
 
 @Data
-public class Film implements Comparable<Film> {
+public class Film {
 
     private int id;
 
@@ -25,12 +25,12 @@ public class Film implements Comparable<Film> {
         likes.add(id);
     }
 
-    public int deleteLike(int id) {
-        likes.remove(id);
-        return id;
+    public boolean deleteLike(int id) {
+
+        return likes.remove(id);
     }
 
-    public Integer getSizeLikes() {
+    public int getSizeLikes() {
         return likes.size();
     }
 
@@ -45,10 +45,5 @@ public class Film implements Comparable<Film> {
     @Override
     public int hashCode() {
         return Objects.hash(id, name, description, releaseDate, duration, likes);
-    }
-
-    @Override
-    public int compareTo(Film o) {
-        return this.getSizeLikes().compareTo(o.getSizeLikes());
     }
 }

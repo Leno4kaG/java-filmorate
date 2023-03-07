@@ -17,9 +17,9 @@ public class User {
     public void addFriend(int id){
         friends.add(id);
     }
-    public int deleteFriend(int id){
-       friends.remove(id);
-       return id;
+    public boolean deleteFriend(int id){
+
+       return friends.remove(id);
     }
     public List<Integer> getFriends(){
         return new ArrayList<>(friends);

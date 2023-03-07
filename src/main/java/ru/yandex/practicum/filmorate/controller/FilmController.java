@@ -22,36 +22,31 @@ import java.util.Optional;
 public class FilmController {
 
 
-    private final ValidateService validateService;
-    private final FilmStorage filmStorage;
+
+
     private final FilmService filmService;
 
     @PostMapping
     public Film addFilm(@RequestBody Film newFilm) {
-        validateService.validateFilm(newFilm);
-        Film filmSave = filmStorage.save(newFilm);
-        log.info("Добавлен фильм = {}", newFilm.getName());
-        return filmSave;
+
+        return filmService.addFilm(newFilm);
     }
 
     @PutMapping
     public Film updateFilm(@RequestBody Film film) {
-        validateService.validateFilm(film);
-        Film filmUpdate = filmStorage.update(film);
-        log.info("Фильм с ID = " + film.getId() + " обновлен");
 
-        return filmUpdate;
+
+        return filmService.updateFilm(film);
     }
 
     @GetMapping
     public List<Film> getFilms() {
-        return filmStorage.getFilms();
+        return filmService.getFilms();
     }
 
     @GetMapping("/{id}")
     public Film getFilmById(@PathVariable Integer id) {
-        return Optional.ofNullable(filmStorage.getFilm(id)).orElseThrow(() ->
-                new FilmNotFoundException(String.format("Фильм № %d не найден", id)));
+        return filmService.getFilmById(id);
     }
 
     @PutMapping("/{id}/like/{userId}")
@@ -67,7 +62,7 @@ public class FilmController {
     @GetMapping("/popular")
     public List<Film> getListFilms(@RequestParam(value = "count", defaultValue = "10", required = false) Integer count) {
         if (count <= 0) {
-            throw new ValidationException("Count < 0");
+            throw new ValidationException("Count <= 0");
         }
         return filmService.getListFilms(count);
     }

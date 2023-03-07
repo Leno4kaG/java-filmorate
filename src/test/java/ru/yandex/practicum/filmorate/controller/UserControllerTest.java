@@ -20,7 +20,7 @@ class UserControllerTest {
     private ValidateService validateService = new ValidateService();
     private InMemoryUserStorage userStorage = new InMemoryUserStorage();
     private UserService userService = new UserService(userStorage);
-    private UserController userController = new UserController(validateService, userStorage, userService);
+    private UserController userController = new UserController(userService);
 
     @Test
     void createUserIsNull() {
