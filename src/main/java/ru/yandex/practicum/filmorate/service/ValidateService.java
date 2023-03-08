@@ -15,7 +15,7 @@ public class ValidateService {
     public static final LocalDate DATE_RELEASE = LocalDate.parse("1895-12-28",
             DateTimeFormatter.ofPattern("yyyy-MM-dd"));
 
-    public void validateUser(User user){
+    public static void validateUser(User user){
 
         if(user == null) {
             log.error("User не должен быть пустым");
@@ -40,7 +40,7 @@ public class ValidateService {
 
     }
 
-    public void validateFilm(Film film){
+    public static void validateFilm(Film film){
         if (film == null) {
             log.error("Фильм не должен быть пустым");
             throw new ValidationException("Фильм не должен быть пустым");
