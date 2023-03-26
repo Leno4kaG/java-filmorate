@@ -2,7 +2,7 @@
 Template repository for Filmorate project.
 
 
-![Диаграмма с таблицами](https://github.com/Leno4kaG/java-filmorate/blob/main/QuickDBD-filmorate.png)
+![Диаграмма с таблицами](https://github.com/Leno4kaG/java-filmorate/blob/main/QuickDBD-filmorate%20.png)
 
 
 Для получения фильма по id: 
