@@ -44,4 +44,14 @@ public class TestDate {
         film.setDuration(35);
         return film;
     }
+
+    public static User getUser(){
+        User user = new User();
+        user.setEmail("email@m.ru");
+        user.setLogin("login");
+        user.setName("");
+        user.setBirthday(LocalDate.parse("1995/12/10",
+                DateTimeFormatter.ofPattern("yyyy/MM/dd")));
+        return user;
+    }
 }

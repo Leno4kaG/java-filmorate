@@ -1,13 +1,18 @@
 package ru.yandex.practicum.filmorate.controller;
 
 import ru.yandex.practicum.filmorate.exception.FilmNotFoundException;
+import ru.yandex.practicum.filmorate.exception.UserNotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import org.junit.jupiter.api.Test;
-import ru.yandex.practicum.filmorate.repository.FilmRepository;
+import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.FilmService;
+import ru.yandex.practicum.filmorate.service.UserService;
 import ru.yandex.practicum.filmorate.service.ValidateService;
+import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.film.InMemoryFilmStorage;
+import ru.yandex.practicum.filmorate.storage.user.InMemoryUserStorage;
+import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -20,10 +25,13 @@ class FilmControllerTest {
 
 
     private ValidateService validateService = new ValidateService();
-    private InMemoryFilmStorage filmStorage = new InMemoryFilmStorage();
-    private FilmService filmService = new FilmService(filmStorage);
+    private FilmStorage filmStorage = new InMemoryFilmStorage();
+    private UserStorage userStorage = new InMemoryUserStorage();
+    private FilmService filmService = new FilmService(filmStorage, userStorage);
 
     private FilmController filmController = new FilmController(filmService);
+
+    private UserController userController = new UserController(new UserService(userStorage));
 
 
     @Test
@@ -130,25 +138,29 @@ class FilmControllerTest {
 @Test
     void addLike(){
         Film film = filmController.addFilm(TestDate.getFilm());
-        Film filmWithLike = filmController.addLike(film.getId(), 1);
-        assertEquals(1, filmWithLike.getLikes().iterator().next());
+        User user = userController.createUser(TestDate.addUser());
+        Film filmWithLike = filmController.addLike(film.getId(), user.getId());
+    System.out.println(user);
+        assertEquals(user.getId(), filmWithLike.getLikes().iterator().next());
 
-        FilmNotFoundException exception = assertThrows(FilmNotFoundException.class, ()-> filmController.addLike(film.getId(), -1));
-        assertEquals("Id -1 не должен быть меньше 0", exception.getMessage());
+        UserNotFoundException exception = assertThrows(UserNotFoundException.class, ()-> filmController.addLike(film.getId(), 1333));
+        assertEquals(String.format("Пользователь с идентификатором %d не найден.", 1333), exception.getMessage());
     }
     @Test
     void deleteLike(){
         Film film = filmController.addFilm(TestDate.getFilm());
-        Film filmWithLike = filmController.deleteLike(film.getId(), 1);
+        User user = userController.createUser(TestDate.addUser());
+        Film filmWithLike = filmController.deleteLike(film.getId(), user.getId());
        assertTrue(filmWithLike.getLikes().isEmpty());
 
-        FilmNotFoundException exception = assertThrows(FilmNotFoundException.class, ()-> filmController.deleteLike(film.getId(), -1));
-        assertEquals("Id -1 не должен быть меньше 0", exception.getMessage());
+        UserNotFoundException exception = assertThrows(UserNotFoundException.class, ()-> filmController.deleteLike(film.getId(), 2222));
+        assertEquals(String.format("Пользователь с идентификатором %d не найден.", 2222), exception.getMessage());
     }
     @Test
     void getListFilms(){
         Film film = filmController.addFilm(TestDate.getFilm());
-        Film filmWithLike = filmController.addLike(film.getId(), 1);
+        User user = userController.createUser(TestDate.addUser());
+        Film filmWithLike = filmController.addLike(film.getId(), user.getId());
 
         List<Film> films = filmController.getListFilms(1);
         assertEquals(filmWithLike, films.get(0));
