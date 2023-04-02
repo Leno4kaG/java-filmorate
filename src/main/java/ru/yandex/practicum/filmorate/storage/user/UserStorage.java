@@ -6,15 +6,15 @@ import java.util.List;
 import java.util.Optional;
 
 public interface UserStorage {
-    public Optional<User> save(User user);
+    Optional<User> save(User user);
 
-    public Optional<User> update(User user);
+    Optional<User> update(User user);
 
-    public List<User> getUsers();
+    List<User> getUsers();
 
-    public Optional<User> getUser(int id);
+    Optional<User> getUser(int id);
 
-    boolean addFriend(int id, int friendId, boolean confirmation_status);
+    boolean addFriend(int id, int friendId, boolean confirmationStatus);
 
     boolean deleteFriend(int id, int friendId);
 
