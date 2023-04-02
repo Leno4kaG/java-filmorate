@@ -26,8 +26,9 @@ class UserControllerTest {
         ValidationException exception = assertThrows(ValidationException.class, () -> userController.createUser(null));
         assertEquals(USER_NULL, exception.getMessage());
     }
+
     @Test
-    void createUserEmailIsNotCorrect(){
+    void createUserEmailIsNotCorrect() {
         User user = new User();
         user.setEmail(" ");
         User user1 = new User();
@@ -37,8 +38,9 @@ class UserControllerTest {
         ValidationException exception1 = assertThrows(ValidationException.class, () -> userController.createUser(user1));
         assertEquals(EMAIL_ERROR, exception1.getMessage());
     }
+
     @Test
-    void createUserLoginIsEmpty(){
+    void createUserLoginIsEmpty() {
         User user = new User();
         user.setEmail("email@m.ru");
         user.setLogin("");
@@ -50,8 +52,9 @@ class UserControllerTest {
         ValidationException exception1 = assertThrows(ValidationException.class, () -> userController.createUser(user1));
         assertEquals(LOGIN_ERROR, exception1.getMessage());
     }
+
     @Test
-    void createUserNameIsEmpty(){
+    void createUserNameIsEmpty() {
         User user = new User();
         user.setEmail("email@m.ru");
         user.setLogin("login");
@@ -61,8 +64,9 @@ class UserControllerTest {
         User user1 = userController.createUser(user);
         assertEquals(user.getLogin(), user1.getName());
     }
+
     @Test
-    void createUserBirthdayInFuture(){
+    void createUserBirthdayInFuture() {
         User user = new User();
         user.setEmail("email@m.ru");
         user.setLogin("login");
@@ -76,8 +80,9 @@ class UserControllerTest {
         ValidationException exception = assertThrows(ValidationException.class, () -> userController.createUser(null));
         assertEquals(USER_NULL, exception.getMessage());
     }
+
     @Test
-    void updateUserEmailIsNotCorrect(){
+    void updateUserEmailIsNotCorrect() {
         User user = new User();
         user.setEmail(" ");
         User user1 = new User();
@@ -87,8 +92,9 @@ class UserControllerTest {
         ValidationException exception1 = assertThrows(ValidationException.class, () -> userController.createUser(user1));
         assertEquals(EMAIL_ERROR, exception1.getMessage());
     }
+
     @Test
-    void updateUserLoginIsEmpty(){
+    void updateUserLoginIsEmpty() {
         User user = new User();
         user.setEmail("email@m.ru");
         user.setLogin("");
@@ -100,8 +106,9 @@ class UserControllerTest {
         ValidationException exception1 = assertThrows(ValidationException.class, () -> userController.createUser(user1));
         assertEquals(LOGIN_ERROR, exception1.getMessage());
     }
+
     @Test
-    void updateUserNameIsEmpty(){
+    void updateUserNameIsEmpty() {
         User user = new User();
         user.setEmail("email@m.ru");
         user.setLogin("login");
@@ -111,8 +118,9 @@ class UserControllerTest {
         User user1 = userController.createUser(user);
         assertEquals(user.getLogin(), user1.getName());
     }
+
     @Test
-    void updateUserBirthdayInFuture(){
+    void updateUserBirthdayInFuture() {
         User user = new User();
         user.setEmail("email@m.ru");
         user.setLogin("login");
@@ -120,31 +128,34 @@ class UserControllerTest {
         ValidationException exception = assertThrows(ValidationException.class, () -> userController.createUser(user));
         assertEquals(BIRTHDAY_ERROR, exception.getMessage());
     }
+
     @Test
-    void addFriend(){
+    void addFriend() {
         User user = userController.createUser(TestDate.addUser());
         User user1 = userController.createUser(TestDate.addUser());
 
         User userWithFriend = userController.addFriend(user.getId(), user1.getId());
         assertEquals(user1.getId(), userWithFriend.getFriends().get(0));
 
-        UserNotFoundException exception = assertThrows(UserNotFoundException.class, () -> userController.addFriend(user.getId(),-1));
+        UserNotFoundException exception = assertThrows(UserNotFoundException.class, () -> userController.addFriend(user.getId(), -1));
         assertEquals(String.format("Пользователь № %d не найден", user.getId()), exception.getMessage());
     }
+
     @Test
-    void deleteFriend(){
+    void deleteFriend() {
         User user = userController.createUser(TestDate.addUser());
         User user1 = userController.createUser(TestDate.addUser());
         userController.addFriend(user.getId(), user1.getId());
 
         User userWithOutFriend = userController.deleteFriend(user.getId(), user1.getId());
-       assertTrue(userWithOutFriend.getFriends().isEmpty());
+        assertTrue(userWithOutFriend.getFriends().isEmpty());
 
-        UserNotFoundException exception = assertThrows(UserNotFoundException.class, () -> userController.deleteFriend(user.getId(),-1));
+        UserNotFoundException exception = assertThrows(UserNotFoundException.class, () -> userController.deleteFriend(user.getId(), -1));
         assertEquals("Пользователь № 1 не найден", exception.getMessage());
     }
+
     @Test
-    void getFriends(){
+    void getFriends() {
         User user = userController.createUser(TestDate.addUser());
         User user1 = userController.createUser(TestDate.addUser());
         userController.addFriend(user.getId(), user1.getId());
@@ -155,8 +166,9 @@ class UserControllerTest {
         UserNotFoundException exception = assertThrows(UserNotFoundException.class, () -> userController.getFriends(999));
         assertEquals("Пользователь № 999 не найден", exception.getMessage());
     }
+
     @Test
-    void getCommonFriends(){
+    void getCommonFriends() {
         User user = userController.createUser(TestDate.addUser());
         User user1 = userController.createUser(TestDate.addUser());
         User user2 = userController.createUser(TestDate.addUser());

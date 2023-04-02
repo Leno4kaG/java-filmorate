@@ -3,7 +3,9 @@ package ru.yandex.practicum.filmorate.model;
 import lombok.Data;
 
 import java.time.LocalDate;
-import java.util.*;
+import java.util.HashSet;
+import java.util.Objects;
+import java.util.Set;
 
 @Data
 public class Film {
@@ -32,14 +34,15 @@ public class Film {
         return likes.size();
     }
 
-    public void updateGenre(Set<Genre> newGenres){
+    public void updateGenre(Set<Genre> newGenres) {
         genres.clear();
         genres.addAll(newGenres);
     }
 
-    public void deleteGenre(Genre genre){
+    public void deleteGenre(Genre genre) {
         genres.remove(genre);
     }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

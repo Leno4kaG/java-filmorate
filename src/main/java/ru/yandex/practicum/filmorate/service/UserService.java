@@ -7,7 +7,6 @@ import ru.yandex.practicum.filmorate.exception.UserNotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -61,7 +60,7 @@ public class UserService {
                 new UserNotFoundException(String.format("Пользователь № %d не найден", id)));
         User otherUser = userStorage.getUser(friendId).orElseThrow(() ->
                 new UserNotFoundException(String.format("Пользователь № %d не найден", id)));
-       userStorage.deleteFriend(id, friendId);
+        userStorage.deleteFriend(id, friendId);
         log.info("DELETE user iD {} friends {}", id, friendId);
         return user;
     }

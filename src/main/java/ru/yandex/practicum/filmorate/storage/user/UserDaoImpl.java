@@ -3,14 +3,16 @@ package ru.yandex.practicum.filmorate.storage.user;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.model.User;
 
-import java.sql.*;
+import java.sql.Date;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
 
@@ -26,17 +28,17 @@ public class UserDaoImpl implements UserStorage {
         final String INSERT_SQL = "insert into user (email, login, name, birthday) values(?, ?, ?, ?)";
         KeyHolder keyHolder = new GeneratedKeyHolder();
         jdbcTemplate.update(
-               connection -> {
-                   PreparedStatement ps =
-                           connection.prepareStatement(INSERT_SQL, new String[] {"id"});
-                   ps.setString(1, user.getEmail());
-                   ps.setString(2, user.getLogin());
-                   ps.setString(3, user.getName());
-                   ps.setDate(4, Date.valueOf(user.getBirthday()));
-                   return ps;
-               },
+                connection -> {
+                    PreparedStatement ps =
+                            connection.prepareStatement(INSERT_SQL, new String[]{"id"});
+                    ps.setString(1, user.getEmail());
+                    ps.setString(2, user.getLogin());
+                    ps.setString(3, user.getName());
+                    ps.setDate(4, Date.valueOf(user.getBirthday()));
+                    return ps;
+                },
                 keyHolder);
-       user.setId(keyHolder.getKey().intValue());
+        user.setId(keyHolder.getKey().intValue());
         return Optional.of(user);
     }
 
@@ -48,8 +50,8 @@ public class UserDaoImpl implements UserStorage {
                     user.getEmail(), user.getLogin(), user.getName(), user.getBirthday(), user.getId());
             return Optional.of(user);
         }
-            log.info("Пользователь с идентификатором {} не найден.", user.getId());
-            return Optional.empty();
+        log.info("Пользователь с идентификатором {} не найден.", user.getId());
+        return Optional.empty();
 
     }
 
@@ -73,8 +75,8 @@ public class UserDaoImpl implements UserStorage {
             getFriendsToUser(user);
             return Optional.of(user);
         }
-            log.info("Пользователь с идентификатором {} не найден.", id);
-            return Optional.empty();
+        log.info("Пользователь с идентификатором {} не найден.", id);
+        return Optional.empty();
     }
 
     @Override
@@ -97,6 +99,7 @@ public class UserDaoImpl implements UserStorage {
                 "AND f.FRIEND_ID in (SELECT friend_id FROM FRIENDS f2 WHERE f2.USER_ID = %d)))", userId, otherUserId);
         return jdbcTemplate.query(sql, (rs, rowNum) -> getUser(rs));
     }
+
     @Override
     public boolean addFriend(int userId, int friendId, boolean confirmationStatus) {
         jdbcTemplate.update("INSERT INTO friends VALUES(?, ?, ?)",

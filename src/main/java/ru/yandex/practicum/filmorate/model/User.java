@@ -14,14 +14,16 @@ public class User {
     private LocalDate birthday;
     private final Set<Integer> friends = new HashSet<>();
 
-    public void addFriend(int id){
+    public void addFriend(int id) {
         friends.add(id);
     }
-    public boolean deleteFriend(int id){
 
-       return friends.remove(id);
+    public boolean deleteFriend(int id) {
+
+        return friends.remove(id);
     }
-    public List<Integer> getFriends(){
+
+    public List<Integer> getFriends() {
         return new ArrayList<>(friends);
     }
 

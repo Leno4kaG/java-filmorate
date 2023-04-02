@@ -83,6 +83,7 @@ public class InMemoryFilmStorage implements FilmStorage {
     public Optional<Rating> getRating(int id) {
         return Optional.empty();
     }
+
     private int compare(Film f0, Film f1) {
         int size0 = f0.getSizeLikes();
         int size1 = f1.getSizeLikes();

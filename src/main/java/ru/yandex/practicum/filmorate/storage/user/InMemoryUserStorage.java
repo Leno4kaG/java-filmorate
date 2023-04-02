@@ -6,6 +6,7 @@ import ru.yandex.practicum.filmorate.exception.UserNotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.util.*;
+
 @Slf4j
 @Component
 public class InMemoryUserStorage implements UserStorage {
@@ -37,7 +38,7 @@ public class InMemoryUserStorage implements UserStorage {
     @Override
     public Optional<User> getUser(int id) {
         User user = users.get(id);
-        if(user == null){
+        if (user == null) {
             return Optional.empty();
         }
         return Optional.of(user);
@@ -69,7 +70,7 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     @Override
-    public List<User> getCommonFriends(int userId, int otherId){
+    public List<User> getCommonFriends(int userId, int otherId) {
         User user = getUser(userId).orElseThrow(() ->
                 new UserNotFoundException(String.format("Пользователь № %d не найден", userId)));
         log.info("User {} by id {}", user, userId);
