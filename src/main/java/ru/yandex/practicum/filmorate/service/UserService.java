@@ -45,12 +45,12 @@ public class UserService {
                 new UserNotFoundException(String.format("Пользователь № %d не найден", id)));
     }
 
-    public User addFriend(int id, int friendId, boolean confirmation_status) {
+    public User addFriend(int id, int friendId, boolean confirmationStatus) {
         User user = userStorage.getUser(id).orElseThrow(() ->
                 new UserNotFoundException(String.format("Пользователь № %d не найден", id)));
         User otherUser = userStorage.getUser(friendId).orElseThrow(() ->
                 new UserNotFoundException(String.format("Пользователь № %d не найден", id)));
-        userStorage.addFriend(id, friendId, confirmation_status);
+        userStorage.addFriend(id, friendId, confirmationStatus);
         log.info("Put user Id {} friend Id {}", id, friendId);
         return user;
     }
