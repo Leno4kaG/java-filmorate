@@ -71,7 +71,10 @@ public class UserDaoImpl implements UserStorage {
             user.setEmail(userRows.getString("email"));
             user.setLogin(userRows.getString("login"));
             user.setName(userRows.getString("name"));
-            user.setBirthday(userRows.getDate("birthday").toLocalDate());
+            Date birthday = userRows.getDate("birthday");
+            if (birthday != null) {
+                user.setBirthday(birthday.toLocalDate());
+            }
             getFriendsToUser(user);
             return Optional.of(user);
         }
@@ -88,16 +91,16 @@ public class UserDaoImpl implements UserStorage {
 
     @Override
     public List<User> getFriends(int userId) {
-        String sql = String.format("select * from user u where u.id in (select f.friend_id from friends f where f.user_id = %d)", userId);
-        return jdbcTemplate.query(sql, (rs, rowNum) -> getUser(rs));
+        String sql = "select * from user u where u.id in (select f.friend_id from friends f where f.user_id = ?)";
+        return jdbcTemplate.query(sql, (rs, rowNum) -> getUser(rs), userId);
     }
 
     @Override
     public List<User> getCommonFriends(int userId, int otherUserId) {
 
-        String sql = String.format("SELECT * FROM USER u WHERE u.ID IN ((SELECT friend_id FROM FRIENDS f WHERE f.USER_ID = %d " +
-                "AND f.FRIEND_ID in (SELECT friend_id FROM FRIENDS f2 WHERE f2.USER_ID = %d)))", userId, otherUserId);
-        return jdbcTemplate.query(sql, (rs, rowNum) -> getUser(rs));
+        String sql = "SELECT * FROM USER u WHERE u.ID IN ((SELECT friend_id FROM FRIENDS f WHERE f.USER_ID = ? " +
+                "AND f.FRIEND_ID in (SELECT friend_id FROM FRIENDS f2 WHERE f2.USER_ID = ?)))";
+        return jdbcTemplate.query(sql, (rs, rowNum) -> getUser(rs), userId, otherUserId);
     }
 
     @Override
@@ -120,7 +123,10 @@ public class UserDaoImpl implements UserStorage {
         user.setEmail(resultSet.getString("email"));
         user.setLogin(resultSet.getString("login"));
         user.setName(resultSet.getString("name"));
-        user.setBirthday(resultSet.getDate("birthday").toLocalDate());
+        Date birthday = resultSet.getDate("birthday");
+        if (birthday != null) {
+            user.setBirthday(birthday.toLocalDate());
+        }
         getFriendsToUser(user);
         return user;
     }

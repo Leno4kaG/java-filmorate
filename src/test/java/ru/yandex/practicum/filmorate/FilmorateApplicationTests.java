@@ -150,14 +150,16 @@ class FilmorateApplicationTests {
 
     @Test
     public void testAddLike() {
-        filmDao.addLike(1, 3);
-        assertThat(filmDao.getFilm(1).get().getLikes().iterator().next()).isEqualTo(1);
+        Film film = filmDao.getFilm(1).get();
+        filmDao.addLike(film, 3);
+        assertThat(film.getLikes().iterator().next()).isEqualTo(1);
     }
 
     @Test
     public void testDeleteLike() {
-        filmDao.deleteLike(1, 3);
-        assertThat(filmDao.getFilm(1).get().getLikes()).isNotIn(3);
+        Film film = filmDao.getFilm(1).get();
+        filmDao.deleteLike(film, 3);
+        assertThat(film.getLikes()).isNotIn(3);
     }
 
     @Test

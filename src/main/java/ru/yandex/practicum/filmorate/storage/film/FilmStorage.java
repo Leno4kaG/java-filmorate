@@ -8,19 +8,19 @@ import java.util.List;
 import java.util.Optional;
 
 public interface FilmStorage {
-    public Optional<Film> save(Film film);
+    Optional<Film> save(Film film);
 
-    public Optional<Film> update(Film film);
+    Optional<Film> update(Film film);
 
-    public List<Film> getFilms();
+    List<Film> getFilms();
 
-    public Optional<Film> getFilm(int id);
+    Optional<Film> getFilm(int id);
 
     List<Film> getListFilms(int count);
 
-    boolean addLike(int id, int userId);
+    boolean addLike(Film film, int userId);
 
-    boolean deleteLike(int id, int userId);
+    boolean deleteLike(Film film, int userId);
 
     List<Genre> getGenres();
 

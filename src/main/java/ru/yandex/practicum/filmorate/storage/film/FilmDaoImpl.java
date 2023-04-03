@@ -47,8 +47,7 @@ public class FilmDaoImpl implements FilmStorage {
         }, keyHolder);
 
         film.setId(keyHolder.getKey().intValue());
-        Set<Genre> genres = updateGenresAndRating(film, film.getMpa().getId());
-        film.updateGenre(genres);
+        updateGenresAndRating(film, film.getMpa().getId());
         return Optional.of(film);
     }
 
@@ -62,16 +61,8 @@ public class FilmDaoImpl implements FilmStorage {
 
             log.info("Update film with id {}!!!", film.getId());
 
-            deleteAllFilmInGenre(film.getId());
-            Set<Genre> genres = updateGenresAndRating(film, mpaId);
-            if (genres.isEmpty()) {
-                for (Integer id : getGenreByFilmId(film.getId())) {
-                    deleteFilmInGenre(film.getId(), id);
-                }
-                log.info("Delete film in genres table!!!");
-            } else {
-                film.updateGenre(genres);
-            }
+            cleanGenresOfFilm(film);
+            updateGenresAndRating(film, mpaId);
             return Optional.of(film);
         }
 
@@ -112,18 +103,18 @@ public class FilmDaoImpl implements FilmStorage {
     }
 
     @Override
-    public boolean addLike(int filmId, int userId) {
+    public boolean addLike(Film film, int userId) {
         jdbcTemplate.update("INSERT INTO likes VALUES(?, ?)",
-                userId, filmId);
-        getFilm(filmId).orElseThrow().addLike(userId);
+                userId, film.getId());
+        film.addLike(userId);
         return true;
     }
 
     @Override
-    public boolean deleteLike(int filmId, int userId) {
+    public boolean deleteLike(Film film, int userId) {
         jdbcTemplate.update("DELETE FROM likes WHERE user_id = ? AND film_id = ?",
-                userId, filmId);
-        getFilm(filmId).orElseThrow().deleteLike(userId);
+                userId, film.getId());
+        film.deleteLike(userId);
         return true;
     }
 
@@ -178,8 +169,8 @@ public class FilmDaoImpl implements FilmStorage {
     }
 
     private void getLikes(Film film) {
-        String sql = String.format("select user_id from likes where film_id = %d", film.getId());
-        List<Integer> likes = jdbcTemplate.query(sql, ((rs, rowNum) -> rs.getInt("user_id")));
+        String sql = "select user_id from likes where film_id = ?";
+        List<Integer> likes = jdbcTemplate.query(sql, ((rs, rowNum) -> rs.getInt("user_id")), film.getId());
         for (Integer like : likes) {
             film.addLike(like);
         }
@@ -205,32 +196,27 @@ public class FilmDaoImpl implements FilmStorage {
     }
 
     private List<Integer> getGenreByFilmId(int filmId) {
-        String sql = String.format("select genre_id from genres where film_id = %d", filmId);
-        return jdbcTemplate.query(sql, ((rs, rowNum) -> rs.getInt("genre_id")));
+        String sql = "select genre_id from genres where film_id = ?";
+        return jdbcTemplate.query(sql, ((rs, rowNum) -> rs.getInt("genre_id")), filmId);
     }
 
-    private void deleteFilmInGenre(int filmId, int genreId) {
-        jdbcTemplate.update("DELETE FROM genres WHERE film_id = ? AND genre_id = ?",
-                filmId, genreId);
-    }
-
-    private void deleteAllFilmInGenre(int filmId) {
+    private void cleanGenresOfFilm(Film film) {
         jdbcTemplate.update("DELETE FROM genres WHERE film_id = ?",
-                filmId);
+                film.getId());
     }
 
-    private Set<Genre> updateGenresAndRating(Film film, int mpaId) {
+    private void updateGenresAndRating(Film film, int mpaId) {
         Rating mpa = getRating(mpaId).orElseThrow(() -> new RatingNotFoundException("Рейтинг не найден!!"));
         film.setMpa(mpa);
         Set<Genre> genres = new HashSet<>();
         for (Genre genre : film.getGenres()) {
             if (genre != null) {
-                addGenreInFilm(film.getId(), genre.getId());
                 Genre genre1 = getGenre(genre.getId()).orElseThrow(() -> new GenreNotFoundException("Жанр не найден!!"));
+                addGenreInFilm(film.getId(), genre.getId());
                 genres.add(genre1);
             }
         }
-        return genres;
+        film.updateGenre(genres);
     }
 
     private void updateGenres(Film film) {

@@ -58,7 +58,7 @@ public class FilmService {
                 new FilmNotFoundException(String.format("Фильм № %d не найден", id)));
         userStorage.getUser(userId).orElseThrow(() -> new UserNotFoundException(
                 String.format("Пользователь с идентификатором %d не найден.", userId)));
-        filmStorage.addLike(id, userId);
+        filmStorage.addLike(film, userId);
         return film;
     }
 
@@ -67,7 +67,7 @@ public class FilmService {
                 new FilmNotFoundException(String.format("Фильм № %d не найден", id)));
         userStorage.getUser(userId).orElseThrow(() -> new UserNotFoundException(
                 String.format("Пользователь с идентификатором %d не найден.", userId)));
-        filmStorage.deleteLike(id, userId);
+        filmStorage.deleteLike(film, userId);
         return film;
     }
 
