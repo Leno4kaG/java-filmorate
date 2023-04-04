@@ -26,7 +26,7 @@ public class TestDate {
 
     public static String DURATION_ERROR = "Продолжительность фильма должна быть положительной";
 
-    public static User addUser(){
+    public static User addUser() {
         User user = new User();
         user.setEmail("email@m.ru");
         user.setLogin("login");
@@ -35,7 +35,8 @@ public class TestDate {
                 DateTimeFormatter.ofPattern("yyyy-MM-dd")));
         return user;
     }
-    public static Film getFilm(){
+
+    public static Film getFilm() {
         Film film = new Film();
         film.setName("name");
         film.setDescription("Description");
@@ -43,5 +44,15 @@ public class TestDate {
                 DateTimeFormatter.ofPattern("yyyy-MM-dd")));
         film.setDuration(35);
         return film;
+    }
+
+    public static User getUser() {
+        User user = new User();
+        user.setEmail("email@m.ru");
+        user.setLogin("login");
+        user.setName("");
+        user.setBirthday(LocalDate.parse("1995/12/10",
+                DateTimeFormatter.ofPattern("yyyy/MM/dd")));
+        return user;
     }
 }

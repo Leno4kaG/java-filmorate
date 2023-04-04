@@ -3,22 +3,16 @@ package ru.yandex.practicum.filmorate.controller;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.exception.UserNotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.repository.UserRepository;
 import ru.yandex.practicum.filmorate.service.UserService;
-import ru.yandex.practicum.filmorate.service.ValidateService;
-import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
 import java.util.List;
-import java.util.Optional;
 
 @Slf4j
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/users")
 public class UserController {
-
 
 
     private final UserService userService;
@@ -30,7 +24,7 @@ public class UserController {
 
     @PutMapping
     public User updateUser(@RequestBody User user) {
-               return userService.updateUser(user);
+        return userService.updateUser(user);
     }
 
     @GetMapping
@@ -45,7 +39,7 @@ public class UserController {
 
     @PutMapping("/{id}/friends/{friendId}")
     public User addFriend(@PathVariable Integer id, @PathVariable Integer friendId) {
-        return userService.addFriend(id, friendId);
+        return userService.addFriend(id, friendId, true);
     }
 
     @DeleteMapping("/{id}/friends/{friendId}")

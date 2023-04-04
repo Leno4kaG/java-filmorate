@@ -1,84 +1,97 @@
 package ru.yandex.practicum.filmorate.service;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
 import ru.yandex.practicum.filmorate.exception.FilmNotFoundException;
-import ru.yandex.practicum.filmorate.exception.ValidationException;
+import ru.yandex.practicum.filmorate.exception.GenreNotFoundException;
+import ru.yandex.practicum.filmorate.exception.RatingNotFoundException;
+import ru.yandex.practicum.filmorate.exception.UserNotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.Genre;
+import ru.yandex.practicum.filmorate.model.Rating;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
+import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
 public class FilmService {
     private final FilmStorage filmStorage;
 
-    @Autowired
-    public FilmService(FilmStorage filmStorage) {
+    private final UserStorage userStorage;
+
+    public FilmService(@Qualifier("filmDaoImpl") FilmStorage filmStorage, @Qualifier("userDaoImpl") UserStorage userStorage) {
         this.filmStorage = filmStorage;
+        this.userStorage = userStorage;
     }
 
     public Film addFilm(Film newFilm) {
         ValidateService.validateFilm(newFilm);
-        Film filmSave = filmStorage.save(newFilm);
+        Film filmSave = filmStorage.save(newFilm).orElseThrow(() ->
+                new FilmNotFoundException(String.format("Фильм с ID %d не сохранен!!!", newFilm.getId())));
         log.info("Добавлен фильм = {}", newFilm.getName());
         return filmSave;
     }
+
     public Film updateFilm(Film film) {
-       ValidateService.validateFilm(film);
-        Film filmUpdate = filmStorage.update(film);
+        ValidateService.validateFilm(film);
+        Film filmUpdate = filmStorage.update(film).orElseThrow(() ->
+                new FilmNotFoundException(String.format("Фильм с ID %d не обновлен!!!", film.getId())));
         log.info("Фильм обновлен Id = {}", film.getId());
 
         return filmUpdate;
     }
+
     public List<Film> getFilms() {
         return filmStorage.getFilms();
     }
+
     public Film getFilmById(Integer id) {
-        return Optional.ofNullable(filmStorage.getFilm(id)).orElseThrow(() ->
+        return filmStorage.getFilm(id).orElseThrow(() ->
                 new FilmNotFoundException(String.format("Фильм № %d не найден", id)));
     }
 
     public Film addLike(int id, int userId) {
-        Film film = Optional.ofNullable(filmStorage.getFilm(id)).
-                orElseThrow(() -> new FilmNotFoundException(String.format("Фильм № %d не найден", id)));
-        if (userId<0){
-            throw new FilmNotFoundException(String.format("Id %d не должен быть меньше 0", userId));
-        }
-            film.addLike(userId);
+        Film film = filmStorage.getFilm(id).orElseThrow(() ->
+                new FilmNotFoundException(String.format("Фильм № %d не найден", id)));
+        userStorage.getUser(userId).orElseThrow(() -> new UserNotFoundException(
+                String.format("Пользователь с идентификатором %d не найден.", userId)));
+        filmStorage.addLike(film, userId);
         return film;
     }
 
     public Film deleteLike(int id, int userId) {
-        Film film = Optional.ofNullable(filmStorage.getFilm(id)).
-                orElseThrow(() -> new FilmNotFoundException(String.format("Фильм № %d не найден", id)));
-        if (userId<0){
-            throw new FilmNotFoundException(String.format("Id %d не должен быть меньше 0", userId));
-        }
-        film.deleteLike(userId);
+        Film film = filmStorage.getFilm(id).orElseThrow(() ->
+                new FilmNotFoundException(String.format("Фильм № %d не найден", id)));
+        userStorage.getUser(userId).orElseThrow(() -> new UserNotFoundException(
+                String.format("Пользователь с идентификатором %d не найден.", userId)));
+        filmStorage.deleteLike(film, userId);
         return film;
     }
 
     public List<Film> getListFilms(int count) {
-        List<Film> allFilms = filmStorage.getFilms();
-
-        if(allFilms.isEmpty()){
-            return allFilms;
-        }
-        return allFilms.stream().sorted(this::compare).limit(count).collect(Collectors.toList());
+        return filmStorage.getListFilms(count);
     }
 
-    private int compare(Film f0, Film f1) {
-        int size0 = f0.getSizeLikes();
-        int size1 = f1.getSizeLikes();
-        return Integer.compare(size1, size0);
+    public List<Genre> getGenres() {
+        return filmStorage.getGenres();
     }
+
+    public Genre getGenre(int id) {
+        return filmStorage.getGenre(id).orElseThrow(() -> new GenreNotFoundException(
+                String.format("Жанр с id %d не найден ", id)));
+    }
+
+    public List<Rating> getRatings() {
+        return filmStorage.getRatings();
+    }
+
+    public Rating getRating(int id) {
+        return filmStorage.getRating(id).orElseThrow(() -> new RatingNotFoundException(
+                String.format("Рейтинг с id %d не найден ", id)));
+    }
+
+
 }
