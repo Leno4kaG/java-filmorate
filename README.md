@@ -1,5 +1,5 @@
 # java-filmorate
-Template repository for Filmorate project.
+В данном проекте реализована следующая функциональность: возможность добавления, редактирование, получения и удаления фильма, а также добавление и удаление лаков для фильма.
 
 
 ![Диаграмма с таблицами](https://github.com/Leno4kaG/java-filmorate/blob/main/QuickDBD-filmorate%20.png)
